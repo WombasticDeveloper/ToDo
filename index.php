@@ -1,3 +1,6 @@
+<?php
+  include('api/start.php');
+?>
 <!DOCTYPE html>
 <html lang='pl'>
   <head>
@@ -11,12 +14,10 @@
     </section>
     <section id="logIn">
         <h2 id="text">Sign in</h2>
-        <form id="form">
-            <label id="ch1">Login</label><input type="text">
-            <br>
-            <label>Password</label><input type="password">
-            <br>
-            <input type="button" id="ch2" value="Sign in">
+        <form id="form" action="api/login.php" method="POST">
+            <label id="ch1">Login</label><input type="text" name="login"><br>
+            <label>Password</label><input type="password" name="pass"><br>
+            <input type="submit" id="ch2" value="Sign in"><br>
             <p id="textR">Don't have an account yet? <span onclick="ChangeForm(1)">Sign up</span></p>
         </form>
     </section>
@@ -53,7 +54,7 @@
         }
     }
 
-    //creates label with input and args. repsondes for a type name and place where to put these objects//
+    //creates label with input and args. repsondes for a type, name and place where to put these objects//
     function CreateLabelInput(type,name,before){
         const label = document.createElement('label');
         label.setAttribute('for', name);
@@ -63,6 +64,7 @@
         const input = document.createElement('input');
         input.setAttribute('type', type);
         input.setAttribute('id',name);
+        input.setAttribute('name',name);
 
         form.insertBefore(label,document.getElementById(before));
         form.insertBefore(input,document.getElementById(before));
