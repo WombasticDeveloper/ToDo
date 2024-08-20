@@ -1,3 +1,6 @@
+<?php
+  require('api/start.php')
+?>
 <!DOCTYPE html>
 <html lang='pl'>
   <head>
