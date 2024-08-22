@@ -16,10 +16,10 @@ CREATE TABLE Tasks(
     User_ID INT,
     Done BIT DEFAULT 0,
     Title VARCHAR(40) NOT NULL,
-    Describition LONGTEXT,
+    Description LONGTEXT,
     Tag_ID INT NOT NULL,
     DateSet DATE,
-    Task_Priority INT
+    Task_Priority VARCHAR(20)
 );
 
 CREATE TABLE Tags(
@@ -47,4 +47,4 @@ INSERT INTO Tags (User_ID,Tag_Name,Tag_Color) VALUES
 (1,'Reading','#60CE9E');
 
 INSERT INTO Tasks (User_ID,Title,Tag_ID,Task_Priority) VALUES 
-(1,'Test',1,3);
+(1,'Test',1,'High Priority');
