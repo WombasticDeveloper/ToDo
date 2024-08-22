@@ -19,7 +19,6 @@ CREATE TABLE Tasks(
     Describition LONGTEXT,
     Tag_ID INT NOT NULL,
     DateSet DATE,
-    DateUntil INT,
     Task_Priority INT
 );
 
