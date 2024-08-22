@@ -11,7 +11,6 @@
 				$_SESSION['userToken']=NULL;
 				header("Location: login.php");
 			}
-			
 		}
 		mysqli_close($con);
 	}
@@ -37,13 +36,14 @@
 			mysqli_close($con);
       	?>
 		<form method="POST">
-			<input type="submit" value="Log out">
+			<input type="submit" name="logout" value="Log out">
 	  	</form>
 		<?php
-			if($_SERVER["REQUEST_METHOD"] == "POST"){
+			$con=new mysqli('localhost','root','','ToDo');
+			if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])){
 				$_SESSION['userToken']=NULL;
 				$sql="UPDATE USERS set Expiry=NOW();";
-				$query=mysqli_query($con,$sql);
+				mysqli_query($con,$sql);
 
 				header("Location: home.php");
 			}
@@ -52,31 +52,52 @@
     </section>
     <section id="Task">
       <?php
-      
+
       ?>
     </section>
     <section id="addT">
-      <h2>Add new tasks</h2>
-      <input type="text" placeholder="Enter your task" value="Name">
-      <input type="button" value="+">
-      <br>
-      <select id="tag">
-        <option>Work</option>
-        <option>School</option>
-        <option>Home</option>
-      </select>
-      <input type="date">
-      <select id="priority">
-        <option>Very High priority</option>
-        <option>High priority</option>
-        <option>Medium priority</option>
-        <option>Low priority</option>
-      </select>
+      	<h2>Add new tasks</h2>
+	  	<form method="POST">
+      		<input type="text" placeholder="Enter your task title" name="title">
+      		<input type="submit" value="+" name='addtask'><br>
+      		<select name='tag'>
+        		<option value=1>Work</option>
+        		<option value=2>School</option>
+        		<option value=3>Home</option>
+      		</select>
+      		<input type="date" name='date'>
+      		<select name='priority'>
+        		<option>Very High priority</option>
+        		<option>High priority</option>
+        		<option>Medium priority</option>
+        		<option>Low priority</option>
+      		</select>
+		</form>
+		<?php
+			if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
+				$con=new mysqli('localhost','root','','ToDo');
+				$id=1;
+				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
+				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
+				mysqli_query($con,$sql);
+			}
+		?>
     </section>
     <section id="tasks">
       <h2>Your tasks</h2><hr>
       <?php
-      
+		$con=new mysqli('localhost','root','','ToDo');
+		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority FROM TASKS 
+			  INNER JOIN TAGS ON TASKS.Tag_ID=TAGS.Tag_ID 
+			  WHERE TASKS.User_ID LIKE (SELECT User_ID FROM Users WHERE UserToken LIKE '$_SESSION[userToken]');";
+		$query=mysqli_query($con,$sql);
+		while($row=mysqli_fetch_array($query)){
+			echo "<section id=task>";
+			echo "<h3>$row[0]</h3>";
+			echo "<p>$row[1]</p>";
+			echo "<span id='tag'>$row[2]</span> <span id='date'>$row[3]</span> <span id='prio'>$row[4]</span>";
+			echo "</section>";
+		}
       ?>
     </section>
     <section id="footer">
