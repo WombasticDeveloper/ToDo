@@ -1,3 +1,18 @@
+<?php
+  session_start();
+  if(!empty($_SESSION['userToken'])){
+
+	$con=new mysqli('localhost','root','','ToDo');
+	$sql="SELECT Expiry FROM USERS WHERE UserToken LIKE '$_SESSION[userToken]';";
+	$query=mysqli_query($con,$sql);
+	if($row=mysqli_fetch_array($query)){
+		if($row[0]>date("Y-m-d G:i:s", strtotime("now"))){
+			header("Location: home.php");
+		}
+	  }
+	  mysqli_close($con);
+}
+?>
 <!DOCTYPE html>
 <html lang='pl'>
 	<head>
@@ -22,7 +37,7 @@
         	<?php
 				$con=new mysqli('localhost','root','','ToDo');
 				$login=$email=$pass=$rpass="";
-
+  				
           		if ($_SERVER["REQUEST_METHOD"] == "POST"){
 					if(empty($_POST['email'])){
 						echo "Please enter your e-mail!";
@@ -37,6 +52,7 @@
             		$sql="SELECT Login, Password FROM USERS WHERE Login LIKE '$login'";
             		$query=mysqli_query($con,$sql);
           		}
+				mysqli_close($con);
 			?>
     	</section>
     	<section id="footer">

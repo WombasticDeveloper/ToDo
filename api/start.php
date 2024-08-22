@@ -1,4 +1,9 @@
+<body>
+    <form method="POST">
+        <input type='checkbox' name='c'>
+        <input type='submit'>
+    </form>
+</body>
 <?php
-    session_start();
-    #header("Location: login.php");
+    echo date("Y-m-d G:i:s", strtotime("now"));
 ?>
