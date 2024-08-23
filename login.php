@@ -42,12 +42,14 @@
 					$sql="SELECT User_ID, Login, Password, UserToken FROM USERS WHERE Login LIKE '$login';";
             		$query=mysqli_query($con,$sql);
 					if($row=mysqli_fetch_array($query)){
-						if($row[2]==$pass){
+
+						if(password_verify($pass,$row[2])){
 							if(isset($_POST['remember'])){
 								$expireTime=strtotime('+ 3 Months');
 							}else{
 								$expireTime=strtotime('+ 1 Hour');
 							}
+							
 							$expireTime=date("Y-m-d G:i:s", $expireTime);
 							$_SESSION['userToken']=$row[3];
 							$sql="UPDATE USERS SET Expiry='$expireTime' WHERE Login LIKE '$login';";
