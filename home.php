@@ -24,7 +24,7 @@
   </head>
   <body>
     <section id="menu">
-    	<h1>To-Do</h1>
+		<a href="home.php"><h1>To-Do</h1></a>
 		<?php
 			$token=$_SESSION['userToken'];
 			$con=new mysqli('localhost','root','','ToDo');
@@ -37,6 +37,7 @@
       	?>
 		<form method="POST">
 			<input type="submit" name="logout" value="Log out">
+			<a href="settings.php"><input type="button" value="Settings"></a>
 	  	</form>
 		<?php
 			$con=new mysqli('localhost','root','','ToDo');
