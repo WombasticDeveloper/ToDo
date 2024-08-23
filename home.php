@@ -57,7 +57,7 @@
     </section>
     <section id="addT">
       	<h2>Add new tasks</h2>
-	  	<form method="POST">
+	  	<form method="POST" id='taskForm'>
       		<input type="text" placeholder="Enter your task title" name="title">
       		<input type="submit" value="+" name='addtask'><br>
       		<select name='tag'>
@@ -80,6 +80,8 @@
 				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
 				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
 				mysqli_query($con,$sql);
+
+				header('Location: home.php');
 			}
 		?>
     </section>
