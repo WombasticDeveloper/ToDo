@@ -51,5 +51,55 @@
 			mysqli_close($con);
 		?>
     </section>
+	<section id="main">
+		<h1>Settings</h1>
+		<section id="personalization">
+			<h3>Personalization</h3>
+			<h6>Tags</h6>
+			<table>
+				<tr><th>Name</th><th>Color</th></tr>
+				<?php
+					$con=new mysqli('localhost','root','','ToDo');
+					$sql="SELECT Tag_Name, Tag_Color FROM `tags` 
+						  INNER JOIN users on tags.User_ID=users.User_ID
+						  WHERE users.UserToken LIKE '$_SESSION[userToken]';";
+					$query=mysqli_query($con,$sql);
+					while($row=mysqli_fetch_array($query)){
+						echo "<tr><td>$row[0]</td><td>$row[1]</td><td onclick='Test()'>Edit</td></tr>";
+					}
+					mysqli_close($con);
+				?>
+			</table>
+			<h6>Theme</h6>
+			<select>
+				<?php 
+					$con=new mysqli('localhost','root','','ToDo');
+					$sql="SELECT Theme FROM users
+						  WHERE UserToken LIKE '$_SESSION[userToken]'";
+					$query=mysqli_query($con,$sql);
+					$row=mysqli_fetch_array($query);
+					if($row[0]==1){
+						echo "<option>Dark</option>";
+						echo "<option>Light</option>";
+					}else{
+						echo "<option>Light</option>";
+						echo "<option>Dark</option>";
+					}
+					mysqli_close($con);
+				?>
+			</select>
+		</section>
+		<section id="personal">
+			<h3>Personal</h3>
+			<p>Change your password</p>
+			<p>Change your login</p>
+			<p>Change your E-mail</p>
+			<p>Delete your account</p>
+		</section>
+	</section>
+	<section id="footer">
+      <p>Created by Kamil Kula</p>
+    </section>
 </body>
+<script src='main.js'></script>
 </html>
