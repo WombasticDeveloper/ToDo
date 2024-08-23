@@ -5,7 +5,7 @@ CREATE TABLE Users(
     User_ID INT AUTO_INCREMENT PRIMARY KEY,
     Login VARCHAR(35) UNIQUE NOT NULL,
     Email VARCHAR(40) UNIQUE NOT NULL,
-    Password VARCHAR(60) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
     UserToken VARCHAR(255) NOT NULL,
     Expiry DATETIME NOT NULL,
     Theme BIT DEFAULT 0
@@ -37,7 +37,7 @@ ALTER TABLE Tags
 ADD FOREIGN KEY (User_ID) REFERENCES Users(User_ID);
 
 INSERT INTO Users (Login,Email,Password,UserToken,Expiry,Theme) VALUES 
-('Admin1','xkamil580@gmail.com','ZAQ!2wsx','c8fbdd396d8a41dab063941004b198ed2e2e1027',NOW(),1);
+('Admin1','xkamil580@gmail.com','$2y$10$iIjbOtsi/vmbXooOD/2BzeeY3Ruzwte2Yt0QqacWSwUHcSHZQv/4S','c8fbdd396d8a41dab063941004b198ed2e2e1027',NOW(),1);
 
 INSERT INTO Tags (User_ID,Tag_Name,Tag_Color) VALUES
 (1,'Work','#F03B3B'),
