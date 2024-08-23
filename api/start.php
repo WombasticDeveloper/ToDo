@@ -5,5 +5,5 @@
     </form>
 </body>
 <?php
-    echo date("Y-m-d G:i:s", strtotime("now"));
+    echo password_hash('',PASSWORD_DEFAULT)
 ?>
