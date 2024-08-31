@@ -76,6 +76,8 @@
 
 				if(empty($errorE) && empty($errorL) && empty($errorP) && empty($errorR)){
 					$pass=password_hash($pass,PASSWORD_DEFAULT);
+					$login=htmlspecialchars($login);
+					$email=htmlspecialchars($email);
 					$token=bin2hex(random_bytes(20));
 					$sql="INSERT INTO USERS (Login,Email,Password,UserToken,Expiry)
 						  VALUES ('$login','$email','$pass','$token',NOW());";
