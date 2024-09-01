@@ -75,14 +75,26 @@
       		</select>
 		</form>
 		<?php
+			$con=new mysqli('localhost','root','','ToDo');
 			if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
-				$con=new mysqli('localhost','root','','ToDo');
-				$id=1;
+				$id=1; #!!!!?!?!?!?!?!?!?!?!?
 				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
 				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
 				mysqli_query($con,$sql);
 
 				header('Location: home.php');
+			}
+
+			// Obsługa usuwania zadania
+			if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskId'])) {
+    			$taskId = intval($_POST['deleteTaskId']);
+    			$sql = "DELETE FROM TASKS WHERE Task_ID = $taskId";
+    			if(mysqli_query($con, $sql)){
+        			echo "Task deleted successfully";
+    			}else{
+        			echo "Error deleting task: " . mysqli_error($con);
+    			}
+    			exit;
 			}
 		?>
     </section>
@@ -90,15 +102,18 @@
       <h2>Your tasks</h2><hr>
       <?php
 		$con=new mysqli('localhost','root','','ToDo');
-		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority FROM TASKS 
+		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority, Task_ID FROM TASKS 
 			  INNER JOIN TAGS ON TASKS.Tag_ID=TAGS.Tag_ID 
 			  WHERE TASKS.User_ID LIKE (SELECT User_ID FROM Users WHERE UserToken LIKE '$_SESSION[userToken]');";
 		$query=mysqli_query($con,$sql);
 		while($row=mysqli_fetch_array($query)){
 			echo "<section id=task>";
-			echo "<h3>$row[0]</h3>";
-			echo "<p>$row[1]</p>";
-			echo "<span id='tag'>$row[2]</span> <span id='date'>$row[3]</span> <span id='prio'>$row[4]</span>";
+			echo "<h5>$row[0]</h5>";
+			echo "<input type='checkbox' id='$row[5]' onclick='DeleteT($row[5])'>";
+			echo "<span id='prio'>$row[4]</span>";
+			echo "<span id='date'>$row[3]</span>";
+			echo "<span id='tag'>$row[2]</span>";
+			echo "<h6 onclick=ShowTask('$row[5]')>&or;</h6>";
 			echo "</section>";
 		}
       ?>
@@ -107,4 +122,5 @@
       <p>Created by Kamil Kula</p>
     </section>
   </body>
+  <script src='main.js'></script>
 </html>
