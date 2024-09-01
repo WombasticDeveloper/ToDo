@@ -1,4 +1,5 @@
 <?php
+	#session validation
 	session_start();
   	if(empty($_SESSION['userToken'])){
       	header("Location: login.php");
@@ -15,6 +16,7 @@
 		mysqli_close($con);
 	}
 ?>
+
 <!DOCTYPE html>
 <html lang='pl'>
   <head>
@@ -23,40 +25,35 @@
     <link rel="stylesheet" href="style.css" type="text/css">
   </head>
   <body>
-    <section id="menu">
-		<a href="home.php"><h1>To-Do</h1></a>
+	<section id='bl'>
+			<a href="home.php"><h2>T0D0</h2></a>
+	</section>
+
+	<section id='bp'>
 		<?php
+			#display user name 
 			$token=$_SESSION['userToken'];
 			$con=new mysqli('localhost','root','','ToDo');
 			$sql="SELECT Login FROM USERS WHERE UserToken LIKE '$token';";
 			$query=mysqli_query($con,$sql);
 			if($row=mysqli_fetch_array($query)){
-				echo '<h4>'.$row[0].' &or;</h4>';
+				echo '<h5>'.$row[0].' &or;</h5>';
 			}
 			mysqli_close($con);
-      	?>
+    	?>
+
+		<!-- Buttons should be showed while 'v' is pressed 
 		<form method="POST">
 			<input type="submit" name="logout" value="Log out">
 			<a href="settings.php"><input type="button" value="Settings"></a>
-	  	</form>
-		<?php
-			$con=new mysqli('localhost','root','','ToDo');
-			if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])){
-				$_SESSION['userToken']=NULL;
-				$sql="UPDATE USERS set Expiry=NOW();";
-				mysqli_query($con,$sql);
+	  	</form> -->
+	</section>
+    
+    <section id="task">
 
-				header("Location: home.php");
-			}
-			mysqli_close($con);
-		?>
     </section>
-    <section id="Task">
-      <?php
 
-      ?>
-    </section>
-    <section id="addT">
+    <section id="addt">
       	<h2>Add new tasks</h2>
 	  	<form method="POST" id='taskForm'>
       		<input type="text" placeholder="Enter your task title" name="title">
@@ -74,30 +71,8 @@
         		<option>Low priority</option>
       		</select>
 		</form>
-		<?php
-			$con=new mysqli('localhost','root','','ToDo');
-			if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
-				$id=1; #!!!!?!?!?!?!?!?!?!?!?
-				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
-				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
-				mysqli_query($con,$sql);
-
-				header('Location: home.php');
-			}
-
-			// Obsługa usuwania zadania
-			if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskId'])) {
-    			$taskId = intval($_POST['deleteTaskId']);
-    			$sql = "DELETE FROM TASKS WHERE Task_ID = $taskId";
-    			if(mysqli_query($con, $sql)){
-        			echo "Task deleted successfully";
-    			}else{
-        			echo "Error deleting task: " . mysqli_error($con);
-    			}
-    			exit;
-			}
-		?>
     </section>
+
     <section id="tasks">
       <h2>Your tasks</h2><hr>
       <?php
@@ -118,9 +93,46 @@
 		}
       ?>
     </section>
-    <section id="footer">
+    <footer>
       <p>Created by Kamil Kula</p>
-    </section>
+    </footer>
+
+	<?php
+			#All the scripts from site - except displaying smth
+		
+		#log out
+		$con=new mysqli('localhost','root','','ToDo');
+		if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])){
+			$_SESSION['userToken']=NULL;
+			$sql="UPDATE USERS set Expiry=NOW();";
+			mysqli_query($con,$sql);
+
+			header("Location: home.php");
+		}
+		mysqli_close($con);
+
+		#creating task
+			if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
+				$id=1; #!!!!?!?!?!?!?!?!?!?!?
+				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
+				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
+				mysqli_query($con,$sql);
+
+				header('Location: home.php');
+			}
+
+		#deleting task
+		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskId'])) {
+    		$taskId = intval($_POST['deleteTaskId']);
+    		$sql = "DELETE FROM TASKS WHERE Task_ID = $taskId";
+    		if(mysqli_query($con, $sql)){
+        		echo "Task deleted successfully";
+    		}else{
+        		echo "Error deleting task: " . mysqli_error($con);
+    		}
+    		exit;
+		}
+	?>
   </body>
   <script src='main.js'></script>
 </html>
