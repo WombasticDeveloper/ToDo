@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+h1{
+    font-size: 48px;
+}
+
+h2{
+    font-size: 40px;
+}
+
+h3{
+    font-size: 33px;
+}
+
+h4{
+    font-size: 28px;
+}
+
+h5{
+    font-size: 23px;
+}
+
+h6{
+    font-size: 19px;
+}
+
+p{
+    font-size: 16px;
+}
+
+:root{
+    --primary: #AB9279;
+    --font-fam:  "IBM Plex Mono", monospace;
+}
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: var(--font-fam);
+    font-weight: 500;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+#bl{
+    width: 75%;
+    height: 58px;
+    padding: 2px 0;
+    float: left;
+    text-align: center;
+    border-bottom: 3px var(--primary) solid;
+    border-right: 3px var(--primary) solid;
+}
+
+#bp{
+    width: 25%;
+    height: 58px;
+    padding: 12px 0;
+    float: left;
+    text-align: center;
+    border-bottom: 3px var(--primary) solid;
+}
+
+#addt{
+    clear: both;
+    width: 100%;
+    padding-top: 64px;
+    padding-left: 48px;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+input[type='text']{
+    width: 40%;
+    height: 24px;
+}
+
+footer{
+    margin-top: 32px;
+    padding: 8px 0;
+    border-top: 3px var(--primary) solid;
+    text-align: center;
+}
