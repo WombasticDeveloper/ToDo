@@ -32,25 +32,35 @@
 	<section id='bp'>
 		<?php
 			#display user name 
+
 			$token=$_SESSION['userToken'];
 			$con=new mysqli('localhost','root','','ToDo');
 			$sql="SELECT Login FROM USERS WHERE UserToken LIKE '$token';";
 			$query=mysqli_query($con,$sql);
 			if($row=mysqli_fetch_array($query)){
-				echo '<h5>'.$row[0].' &or;</h5>';
+				echo '<h5>'.$row[0].'</h5>';
 			}
 			mysqli_close($con);
     	?>
-
-		<!-- Buttons should be showed while 'v' is pressed 
-		<form method="POST">
-			<input type="submit" name="logout" value="Log out">
-			<a href="settings.php"><input type="button" value="Settings"></a>
-	  	</form> -->
+		<h5 id='menu'>&or;</h5>
+		<section id='menucontent'>
+			<form method="POST">
+				<input type="submit" name="logout" value="Log out">
+				<br>
+				<a href="settings.php"><input type="button" value="Settings"></a>
+			</form>
+		</section>
 	</section>
     
-    <section id="task">
-
+    <section id="taskmore">
+		<input type="button" id='Ddone'>
+		<h2 id='Dtitle'></h2>
+		<input type="button" onclick='deleteT(1)' value='Del'> <!-- delete task -->
+		<input type="checkbox" onclick='doneT(1)'> <!-- close window/section -->
+		<span id='Dtag'></span>
+		<span id='Ddate'></span>
+		<span id='Dpriority'></span>
+		<p id='Ddesc'></p>
     </section>
 
     <section id="addt">
@@ -59,9 +69,14 @@
       		<input type="text" placeholder="Enter your task title" name="title">
       		<input type="submit" value="+" name='addtask'><br>
       		<select name='tag'>
-        		<option value=1>Work</option>
-        		<option value=2>School</option>
-        		<option value=3>Home</option>
+        		<?php
+					$con= new mysqli('localhost','root','','ToDo');
+					$sql="SELECT Tag_Name, Tag_ID, Tag_Color FROM tags WHERE User_ID LIKE (SELECT User_ID FROM users WHERE UserToken LIKE '$_SESSION[userToken]');";
+					$query=mysqli_query($con,$sql);
+					while($row=mysqli_fetch_array($query)){
+						echo "<option value=$row[1] style='background-color: $row[2]'>$row[0]</option>";
+					}
+				?>
       		</select>
       		<input type="date" name='date'>
       		<select name='priority'>
@@ -74,21 +89,29 @@
     </section>
 
     <section id="tasks">
-      <h2>Your tasks</h2><hr>
+      <h2>Your tasks</h2>
       <?php
+	  		#generate tasks on site
+
 		$con=new mysqli('localhost','root','','ToDo');
-		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority, Task_ID FROM TASKS 
+		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority, Task_ID, Done FROM TASKS 
 			  INNER JOIN TAGS ON TASKS.Tag_ID=TAGS.Tag_ID 
-			  WHERE TASKS.User_ID LIKE (SELECT User_ID FROM Users WHERE UserToken LIKE '$_SESSION[userToken]');";
+			  WHERE TASKS.User_ID LIKE (SELECT User_ID FROM Users WHERE UserToken LIKE '$_SESSION[userToken]')
+			  ORDER BY Done;";
 		$query=mysqli_query($con,$sql);
 		while($row=mysqli_fetch_array($query)){
 			echo "<section id=task>";
-			echo "<h5>$row[0]</h5>";
-			echo "<input type='checkbox' id='$row[5]' onclick='DeleteT($row[5])'>";
+			if($row[6]==0){
+				echo "<input type='checkbox' id='$row[5]' onclick='doneT($row[5])'>";
+			}elseif($row[6]==1){
+				echo "<input type='checkbox' id='$row[5]' checked onclick='undoneT($row[5])'>";
+			}
+			echo "<p>$row[0]</p>";
 			echo "<span id='prio'>$row[4]</span>";
 			echo "<span id='date'>$row[3]</span>";
 			echo "<span id='tag'>$row[2]</span>";
-			echo "<h6 onclick=ShowTask('$row[5]')>&or;</h6>";
+			echo "<h6 onclick=details($row[5])>&or;</h6>";
+			echo "<p onclick='deleteT($row[5])'>Del</p>";
 			echo "</section>";
 		}
       ?>
@@ -100,37 +123,41 @@
 	<?php
 			#All the scripts from site - except displaying smth
 		
-		#log out
+		
 		$con=new mysqli('localhost','root','','ToDo');
+
+		#log out
 		if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])){
 			$_SESSION['userToken']=NULL;
 			$sql="UPDATE USERS set Expiry=NOW();";
 			mysqli_query($con,$sql);
 
-			header("Location: home.php");
+			header("Location: login.php");
 		}
-		mysqli_close($con);
 
 		#creating task
-			if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
-				$id=1; #!!!!?!?!?!?!?!?!?!?!?
-				$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
-				      VALUES ($id,'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
-				mysqli_query($con,$sql);
+		if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST['addtask'])){
+			$query=mysqli_query($con,"SELECT User_ID FROM users WHERE UserToken LIKE '$_SESSION[userToken]';");
+			$id=mysqli_fetch_array($query);
+			$sql="INSERT INTO TASKS (User_ID,Title,Description,Tag_ID,DateSet,Task_Priority) 
+				  VALUES ($id[0],'$_POST[title]','NULL','$_POST[tag]','$_POST[date]','$_POST[priority]');";
+			mysqli_query($con,$sql);
 
-				header('Location: home.php');
-			}
+			header('Location: home.php');
+		}
 
 		#deleting task
 		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskId'])) {
-    		$taskId = intval($_POST['deleteTaskId']);
-    		$sql = "DELETE FROM TASKS WHERE Task_ID = $taskId";
-    		if(mysqli_query($con, $sql)){
-        		echo "Task deleted successfully";
-    		}else{
-        		echo "Error deleting task: " . mysqli_error($con);
-    		}
-    		exit;
+    		$taskID = intval($_POST['deleteTaskId']);
+    		$sql = "DELETE FROM TASKS WHERE Task_ID = $taskID;";
+    		mysqli_query($con, $sql);
+		}
+
+		#done task
+		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doneTaskId'])) {
+			$taskId = intval($_POST['doneTaskId']);
+			$sql="UPDATE TASKS SET Done = 1 WHERE Task_ID = $taksID;";
+			mysqli_query($con, $sql);
 		}
 	?>
   </body>
