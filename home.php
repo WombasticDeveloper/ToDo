@@ -23,6 +23,7 @@
     <meta charset="utf-8">
     <title>T0_D0</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+	<script src='main.js'></script>
   </head>
   <body>
 	<section id='bl'>
@@ -53,14 +54,15 @@
 	</section>
     
     <section id="taskmore">
-		<input type="button" id='Ddone'>
-		<h2 id='Dtitle'></h2>
-		<input type="button" onclick='deleteT(1)' value='Del'> <!-- delete task -->
-		<input type="checkbox" onclick='doneT(1)'> <!-- close window/section -->
-		<span id='Dtag'></span>
-		<span id='Ddate'></span>
-		<span id='Dpriority'></span>
-		<p id='Ddesc'></p>
+		<p class='Dtitle'>Title</p>
+		<p onclick='deleteT()'>Del</p>
+		<p onclick='closeD()'>X</p>
+		<input type="checkbox" onclick='doneT(1)'>
+		<h2 class='Dtitle'>Title</h2>
+		<span id='Dtag'>Tag</span>
+		<span id='Ddate'>Date</span>
+		<span id='Dpriority'>Priority</span>
+		<p id='Ddesc'>Lorem Ipsum</p>
     </section>
 
     <section id="addt">
@@ -74,7 +76,7 @@
 					$sql="SELECT Tag_Name, Tag_ID, Tag_Color FROM tags WHERE User_ID LIKE (SELECT User_ID FROM users WHERE UserToken LIKE '$_SESSION[userToken]');";
 					$query=mysqli_query($con,$sql);
 					while($row=mysqli_fetch_array($query)){
-						echo "<option value=$row[1] style='background-color: $row[2]'>$row[0]</option>";
+						echo "<option value=$row[1] style='color: $row[2]'>$row[0]</option>";
 					}
 				?>
       		</select>
@@ -89,22 +91,56 @@
     </section>
 
     <section id="tasks">
-      <h2>Your tasks</h2>
-      <?php
+    	<h2>Your tasks</h2>
+		Sort By
+		<select>
+			<option value=1 onclick=sorting(1)>Newest</option>
+			<option value=2 onclick=sorting(2)>Oldest</option>
+			<option value=3 onclick=sorting(3)>Priority</option>
+		</select>
+
+		Filter By
+		<select>
+			<optgroup label='IDK'>
+				<option default>All</option>
+				<option>Unfinished</option>
+				<option>Finished</option>
+			</optgroup>
+			<optgroup label='Tags'>
+				<option default>All</option>
+				<?php
+					$con= new mysqli('localhost','root','','ToDo');
+					$sql="SELECT Tag_Name, Tag_ID, Tag_Color FROM tags WHERE User_ID LIKE (SELECT User_ID FROM users WHERE UserToken LIKE '$_SESSION[userToken]');";
+					$query=mysqli_query($con,$sql);
+					while($row=mysqli_fetch_array($query)){
+						echo "<option value=$row[1] style='color: $row[2]'>$row[0]</option>";
+					}
+				?>
+			</optgroup>
+			<optgroup label='Priority'>
+				<option>All</option>
+				<option>Unfinished</option>
+				<option>Finished</option>
+			</optgroup>
+		</select>
+      	<?php
 	  		#generate tasks on site
 
 		$con=new mysqli('localhost','root','','ToDo');
+		if(empty($_POST['sorting'])){
+			$_POST['sorting']='Done AND Task_ID';
+		}
 		$sql="SELECT Title, Description, TAGS.Tag_Name, DateSet, Task_Priority, Task_ID, Done FROM TASKS 
 			  INNER JOIN TAGS ON TASKS.Tag_ID=TAGS.Tag_ID 
 			  WHERE TASKS.User_ID LIKE (SELECT User_ID FROM Users WHERE UserToken LIKE '$_SESSION[userToken]')
-			  ORDER BY Done;";
+			  ORDER BY ".($_POST['sorting']).";";
 		$query=mysqli_query($con,$sql);
 		while($row=mysqli_fetch_array($query)){
 			echo "<section id=task>";
 			if($row[6]==0){
 				echo "<input type='checkbox' id='$row[5]' onclick='doneT($row[5])'>";
 			}elseif($row[6]==1){
-				echo "<input type='checkbox' id='$row[5]' checked onclick='undoneT($row[5])'>";
+				echo "<input type='checkbox' id='$row[5]' onclick='undoneT($row[5])' checked>";
 			}
 			echo "<p>$row[0]</p>";
 			echo "<span id='prio'>$row[4]</span>";
@@ -147,19 +183,27 @@
 		}
 
 		#deleting task
-		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskId'])) {
-    		$taskID = intval($_POST['deleteTaskId']);
+		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteTaskID'])) {
+    		$taskID = intval($_POST['deleteTaskID']);
     		$sql = "DELETE FROM TASKS WHERE Task_ID = $taskID;";
     		mysqli_query($con, $sql);
 		}
 
 		#done task
-		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doneTaskId'])) {
-			$taskId = intval($_POST['doneTaskId']);
-			$sql="UPDATE TASKS SET Done = 1 WHERE Task_ID = $taksID;";
+		if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['doneTaskID'])) {
+			$taskID = intval($_POST['doneTaskID']);
+			$sql="UPDATE TASKS SET Done = 1 WHERE Task_ID = $taskID;";
 			mysqli_query($con, $sql);
 		}
+
+		#undone task
+		if($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['undoneTaskID'])){
+			$taskID=intval($_POST['undoneTaskID']);
+			$sql="UPDATE TASKS SET Done = 0 WHERE Task_ID = $taskID;";
+			mysqli_query($con, $sql);
+		}
+
+		exit;
 	?>
   </body>
-  <script src='main.js'></script>
 </html>
